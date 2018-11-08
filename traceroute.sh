@@ -18,18 +18,23 @@
 #        echo ''
 #fi
 
-pUDP=1149
-pTCP=21
+pUDP=80
+pTCP=443
 tMAX=1
 star=0
 #Réinitialisation du fichier
 echo > hote2.rte
-
+echo > essai1.dot
 
 #Recherche de l'ip ciblée
-ipcible=$(dig +short "$1" | tail -n1)
+ipcible=$(dig +short "$1" |tail -n1)
 
-echo "digraph essai1 { localhost " >> essai1.dot
+#if [ ! "$(head -n2 essai1.dot |cut -d" " -f1 |grep "strict" )" ]
+#  then
+    echo "strict digraph essai1 { localhost " >> essai1.dot
+#  else
+#    echo "digraph essai1 { localhost " >> essai1.dot
+#fi
 
 #Boucle for pour ajouer 1TTL a chaque nouvelle boucle
 for ttl in $(seq 1 30); do
@@ -103,6 +108,7 @@ for ttl in $(seq 1 30); do
 done
 
 echo "}" >> essai1.dot
+
 
 #On affiche notre fichier route
 cat hote2.rte
