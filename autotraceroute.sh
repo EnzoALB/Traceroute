@@ -27,21 +27,8 @@ fi
 tMAX=10
 star=0
 unknownHOP=0
+fichierRTE=$2
 tab=("-I" "-U -p 53" "-U -p 123" "-T -p 80" "-T -p443")
-fichierdot=$2
-
-#Réinitialisation du fichier
-echo "Initialisation fichier route"
-echo > hote.rte
-
-sed -i '$ s/.$//' $fichierdot >> $fichierdot
-
-echo "Initialisation du fichier .dot"
-if [ ! "$(head -n2 $fichierdot |cut -d" " -f1 |grep "strict" )" ]
-  then echo -e "strict digraph essai1 { \nlocalhost [shape=house]; \n\"localhost\"" >> $fichierdot
-  else
-    echo -e "\nlocalhost [shape=house]; \n\"localhost\" " >> $fichierdot
-fi
 
 
 echo "Début du script"
@@ -58,21 +45,18 @@ do
   echo "$res"
   if [[ "$ipcible" = "$(echo "$res" |awk '{print $1}')" ]]
   then
-    echo "$res" >> hote.rte
-    echo -n -e " -> \"$res\"" >> $fichierdot
+    echo "$ipcible ($1)" >> $fichierRTE
     break 2
   elif [ ! "$(echo "$res" |cut -d" " -f1 |grep "*" )" ]
   then
     star=0
-    echo "$res" >> hote.rte
-    echo -n " -> \"$res\"" >> $fichierdot
+    echo "$res" >> $fichierRTE
     break
   else
     star=$((star + 1))
     if [ $star -eq 5 ]
     then
-      echo "Unknown Router (Hop Nb : $ttl)" >> hote.rte
-      echo -n -e " -> \"Unknown Router (Hop Nb : $ttl)\" \n\"Unknown Router (Hop Nb : $ttl)\" [shape=box color=red]; \n\"Unknown Router (Hop Nb : $ttl)\"" >> $fichierdot
+      echo "Unknown Router (Hop Nb : $ttl)" >> $fichierRTE
       unknownHOP=$((unknownHOP + 1))
       star=0
     fi
@@ -82,9 +66,5 @@ done
   
 done
 
-echo -n -e " -> \"$ipcible ($1)\" \n\"$ipcible ($1)\" [shape=house] }" >> $fichierdot
-echo "$1" >> hote.rte
-echo "$1"
-
 #On affiche notre fichier route
-cat hote.rte
+cat $fichierRTE
