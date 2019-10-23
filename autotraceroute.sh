@@ -20,14 +20,14 @@ fi
 
 if [ -z $2 ]
   then
-    echo "Indiquez un nom pour le fichier d'écriture"
+    echo "Indiquez un nom suffixe au chemin pour définir le nom du fichier route."
     exit
 fi
 
 tMAX=10
 star=0
 unknownHOP=0
-fichierRTE=$2
+fichierRTE="${1}${2}"
 tab=("-I" "-U -p 53" "-U -p 123" "-T -p 80" "-T -p443")
 
 
@@ -40,14 +40,14 @@ for ttl in $(seq 1 30); do
 
 for methode in "${tab[@]}"
 do
-  res=$(traceroute "$1" -A -n -q 1 -w $tMAX -m $ttl $methode |tail -n1 |awk '{print $2 " " $3}' )
-  #res=$(echo "$r" |awk '{print $2 " " $3}')
+  res=$(traceroute "$1" -A -n -q 1 -w $tMAX -m $ttl $methode |tail -n1 |awk '{print $1 " " $2 " " $3}' )
+  resF=$(echo "$res" |awk '{print $1 " " $2}')
   echo "$res"
-  if [[ "$ipcible" = "$(echo "$res" |awk '{print $1}')" ]]
+  if [[ "$ipcible" = "$(echo "$res" |awk '{print $2}')" ]]
   then
-    echo "$ipcible ($1)" >> $fichierRTE
+    echo "$resF ($1)" >> $fichierRTE
     break 2
-  elif [ ! "$(echo "$res" |cut -d" " -f1 |grep "*" )" ]
+  elif [ ! "$(echo "$res" |awk '{print $2}' |grep "*" )" ]
   then
     star=0
     echo "$res" >> $fichierRTE
@@ -56,7 +56,7 @@ do
     star=$((star + 1))
     if [ $star -eq 5 ]
     then
-      echo "Unknown Router (Hop Nb : $ttl)" >> $fichierRTE
+      echo "$ttl Unknown Router (Hop Nb : $ttl)" >> $fichierRTE
       unknownHOP=$((unknownHOP + 1))
       star=0
     fi
@@ -65,6 +65,5 @@ do
 done
   
 done
-
 #On affiche notre fichier route
 cat $fichierRTE
