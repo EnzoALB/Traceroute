@@ -2,22 +2,28 @@
 
 #Traceroute par EnzoALBOUY
 
-nbUk=$(cat $1 |grep "Unknown" |wc -l)
-echo $nbUk
+lFi=$(cat $1|wc -l)
+sed -i -r 's|.*Unknown.*|Unknown|g' $1
+cat $1|uniq > tmp.txt
+#cat tmp.txt
+nbUk=$(cat tmp.txt|grep "Unknown" |wc -l)
+
+echo "$nbUk Réseau(x) inconnu"
 if [ $nbUk != 0 ]
 then
-for ((nbRtr=1;nbRtr<=nbUk;nbRtr++))
+for ((ligne=1;ligne<=lFi;ligne++))
 do
-  unknown=$(cat $1 |grep "Unknown" |head -n $nbRtr |tail -n1)
-  echo $unknown
-  ttl=$(echo $unknown |awk '{print $1}')
-  var=$(cat $1 |head -n $((($ttl+1)))|tail -n1 |awk '{print $2}') 
-  var2=$(cat $1 |head -n $((($ttl-1))) |tail -n1|awk '{print $2}')
-  var3=$(echo "Routeur entre $var et $var2")
-  echo $var3
-  sed -i 's|$unknown|$var3|g' $1
+  if [ $(cat tmp.txt|head -n $ligne|tail -n1 |grep "Unknown") ]
+  then
+    var=$(cat tmp.txt |head -n $((($ligne+1)))|tail -n1|awk '{print $1}') 
+    var2=$(cat tmp.txt |head -n $((($ligne-1)))|tail -n1|awk '{print $1}')
+    var3=$(echo "Réseau entre $var2 et $var")
+    sed -i "s|Unknown|$var3|g" tmp.txt
+    cp tmp.txt $1
+    echo "fini"
+  fi
 done
-else
-	echo "fini"
+  else
+    echo "fini"
 fi
 

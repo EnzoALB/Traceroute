@@ -40,14 +40,14 @@ for ttl in $(seq 1 30); do
 
 for methode in "${tab[@]}"
 do
-  res=$(traceroute "$1" -A -n -q 1 -w $tMAX -m $ttl $methode |tail -n1 |awk '{print $1 " " $2 " " $3}' )
-  resF=$(echo "$res" |awk '{print $1 " " $2}')
+  res=$(traceroute "$1" -A -n -q 1 -w $tMAX -m $ttl $methode |tail -n1 |awk '{print $2 " " $3}' )
+  #resF=$(echo "$res" |awk '{print $2}')
   echo "$res"
-  if [[ "$ipcible" = "$(echo "$res" |awk '{print $2}')" ]]
+  if [[ "$ipcible" = "$(echo "$res" |awk '{print $1}')" ]]
   then
-    echo "$resF ($1)" >> $fichierRTE
+    echo "$ipcible ($1)" >> $fichierRTE
     break 2
-  elif [ ! "$(echo "$res" |awk '{print $2}' |grep "*" )" ]
+  elif [ ! "$(echo "$res" |awk '{print $1}' |grep "*" )" ]
   then
     star=0
     echo "$res" >> $fichierRTE
@@ -56,7 +56,7 @@ do
     star=$((star + 1))
     if [ $star -eq 5 ]
     then
-      echo "$ttl Unknown Router (Hop Nb : $ttl)" >> $fichierRTE
+      echo "Unknown Router (Hop Nb : $ttl)" >> $fichierRTE
       unknownHOP=$((unknownHOP + 1))
       star=0
     fi
