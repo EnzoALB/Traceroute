@@ -56,7 +56,7 @@ do
     star=$((star + 1))
     if [ $star -eq 5 ]
     then
-      echo "Unknown Router (Hop Nb : $ttl)" >> $fichierRTE
+      echo "Unknown" >> $fichierRTE
       unknownHOP=$((unknownHOP + 1))
       star=0
     fi
@@ -70,11 +70,9 @@ done
 #--------------------------------Mise en forme------------------------
 
 lFi=$(cat $fichierRTE|wc -l)
-sed -i -r 's|.*Unknown.*|Unknown|g' $fichierRTE
 cat $fichierRTE|uniq > tmp.txt
 #cat tmp.txt
 nbUk=$(cat tmp.txt|grep "Unknown" |wc -l)
-numUk=1
 
 echo "$nbUk Réseau(x) inconnu"
 if [ $nbUk != 0 ]
@@ -86,8 +84,7 @@ do
     var=$(cat tmp.txt |head -n $((($ligne+1)))|tail -n1|awk '{print $1}')
     var2=$(cat tmp.txt |head -n $((($ligne-1)))|tail -n1|awk '{print $1}')
     var3=$(echo "Réseau entre $var2 et $var")
-    sed -i "s|Unknown|$var3|" tmp.txt
-    numUk=$((($numUk+1)))
+    sed -i "$ligne s|Unknown|$var3|" tmp.txt 
   fi
 done
   else
