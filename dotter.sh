@@ -15,9 +15,9 @@ fi
 
 for ligne in $(cat $1)
 do
-  if echo $ligne |grep "Unknown"
+  if echo $ligne |grep "Réseau"
     then
-      echo -n -e " -> \"$ligne between\" \n\"$ligne\" [shape=box color=red]; \n\"$ligne\"" >> $fichierdot
+      echo -n -e " -> \"$ligne\" \n\"$ligne\" [shape=box color=red]; \n\"$ligne\"" >> $fichierdot
     elif echo $ligne |grep "www."
       then 
         echo -n -e " -> \"$ligne\" \n\"$ligne\" [shape=house] " >> $fichierdot
