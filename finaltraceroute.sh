@@ -41,11 +41,11 @@ for ttl in $(seq 1 30); do
 for methode in "${tab[@]}"
 do
   res=$(traceroute "$1" -A -n -q 1 -w $tMAX -m $ttl $methode |tail -n1 |awk '{print $2 " " $3}' )
-  #resF=$(echo "$res" |awk '{print $2}')
+  resF=$(echo "$res" |awk '{print $1}')
   echo "$res"
-  if [[ "$ipcible" = "$(echo "$res" |awk '{print $1}')" ]]
+  if [ "$(echo $ipcible|grep "$resF")" ]
   then
-    echo "$ipcible ($1)" >> $fichierRTE
+    echo $ipcible "($1)" >> $fichierRTE
     break 2
   elif [ ! "$(echo "$res" |awk '{print $1}' |grep "*" )" ]
   then
